@@ -57,3 +57,25 @@ Value: 키에 저장된 데이터
 ![image](https://github.com/hihiee/Session-based-Recsys/assets/45914097/707c5277-dc4e-4e65-a8a5-95b433f175ad)
 
 - decoder의 hidden state는 query로 사용, 따라서 위 그림에서 $s_i$는 query로 사용됨
+
+
+![image](https://github.com/hihiee/Session-based-Recsys/assets/45914097/9236d423-f3d0-40ff-8c35-193486fb7698)
+
+- decoder에서 $s_i$라는 query가 입력되고, 그 query와 모든 key값인 $h_i$와 comparison 연산을 통해 유사도를 구한 뒤, value에 해당하는 $h_i$와 각각의 유사도를 곱한 뒤 element-wise sum 하여 attention value $a_i$ 출력.
+- 그림에서 사용된 연산을 수식으로 표현하면 아래와 같다.
+
+  $$c_i = softmax(s_i^Th_j)$$
+
+  $$a_i = \sum\limits_{j} c_jh_j$$
+
+  ($k_j$ 와 $v_j$ 자리에 주의할 것)
+
+
+- 여기서 attention value $a_i$는 context vector 라고 불리기도 함 (인코더의 문맥을 포함하고 있기 때문)
+
+![image](https://github.com/hihiee/Session-based-Recsys/assets/45914097/28406297-7dc2-4df6-a86b-9ee6a946f323)
+
+- 마지막으로 attention value와 decoder의 t시점의 hidden state 를 concat한다. decoder의 hidden state는 rnn에서 받아 연산하여 $s_i -> s_i+1$로 만든다. 그 후 $a_i$와 $s_i+1$을 concat하여 $v_i+1$을 만든다.이후 FC-layer와 softmax를 거쳐 최종 출력인 예측 벡터 $y_i$를 출력한다. 
+
+
+
