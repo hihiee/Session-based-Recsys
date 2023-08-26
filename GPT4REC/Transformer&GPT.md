@@ -25,6 +25,8 @@ decoder 의 input으로 encoder의 최종 출력인 context vector만을 사용�
 
 
 
+
+    
   
 
 #### 2. attention mechanism
