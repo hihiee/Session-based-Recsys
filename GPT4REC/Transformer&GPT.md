@@ -25,6 +25,8 @@ decoder 의 input으로 encoder의 최종 출력인 context vector만을 사용�
 
 
 
+  
+
 #### 2. attention mechanism
 
 ![image](https://github.com/hihiee/Session-based-Recsys/assets/45914097/9963f7bd-19ae-473a-bb64-dbe62f1d6904)
@@ -36,4 +38,22 @@ Key: 키, 저장된 데이터 찾을 때 참값
 Value: 키에 저장된 데이터
 ```
 
+![image](https://github.com/hihiee/Session-based-Recsys/assets/45914097/37a54bf9-9a4e-4653-b044-1aec262ce185)
 
+
+- attention에서는 주어진 '하나의' query가 어떤 key와 유사한지 모든 key와 각각 비교해 유사도를 얻고, key와 매핑되어 있는 각각의 value를 모두 더해 attention value를 만든다. 즉, **query에 해당하는 dictionary의 key값들이 query와 얼마나 유사한지 계산**한다. 이때 유사도가 가중치 역할을 한다고 볼 수 있음
+- 이때 **query는 decoder의 hidden state**가 되며, **encoder의 hidden state가 key와 value**가 됨
+- 가장 기본적인 구현 방식으로 comparison은 fully connected 방식 연산, aggregate의 경우 모든 key-value에 대해 벡터의 element-wise multiplication 연산을 한 후 element-wise sum 하여 attention value 생성. 수식은 아래와 같다.
+
+  $$Compare(q, k_j) = q*k_j = q^Tk_j$$
+
+  $$Aggregate(c, V) = \sum\limits_{j} c_jv_j$$
+
+
+![image](https://github.com/hihiee/Session-based-Recsys/assets/45914097/4d593223-b795-4db0-8d9e-64810cd9c738)
+
+- encoder의 hidden state를 (key, value) 로 사용, 위 그림에서 $h_i$는 key와 value로 사용됨
+
+![image](https://github.com/hihiee/Session-based-Recsys/assets/45914097/707c5277-dc4e-4e65-a8a5-95b433f175ad)
+
+- decoder의 hidden state는 query로 사용, 따라서 위 그림에서 $s_i$는 query로 사용됨
