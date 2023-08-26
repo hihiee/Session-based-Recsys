@@ -139,3 +139,81 @@ attention은 문맥 의미를 잘 파악하는 알고리즘이지만 단독으�
 
 
 ![tm3](https://github.com/hihiee/Session-based-Recsys/assets/45914097/851dce02-ce60-4775-ab8d-9787fbe69383)
+
+
+
+<br/><br/><br/><br/>
+
+#### 4. GPT1
+
+- label data를 만드는 데 비용이 소모되는 것을 고려해, unlabeled data를 활용해 임베딩한 뒤 labeled data로 fine tuning하여 성능을 높여보자.
+- unsupervised pre-training과 supervised fine-tuning을 결합한 semi-supervise 접근을 활용하며, 모델 구조는 transformer 를 차용한다.
+      - text의 long-term dependencies에 강인한 결과를 보여주며 기존 rnn 등에 비해 구조화된 memory를 쓸 수 있게 함
+      - LM은 별도의 input text가 필요하지 않기 때문에 트랜스포머 구조에서 encoder를 제외하고 decoder만 사용하였음
+
+
+<br/>
+
+
+> challenge  
+wide range of tasks에 약간의 조정만으로도 transfer 할 수 있는 범용 representation을 학습하는 것
+
+<br/> 
+
+framework 는 2개의 stage :: **1. Pretrain, 2. fine-tuning**
+
+1. Pretrain <br/>
+    transformer decodeer를 이용해 대량의 레이블 없는 corpus를 이용해 LM으로 사전학습 시킴
+2. Fine-tuning <br/>
+    pretrained model을 각 task에 맞게 input과 label로 구성된 corpus에 대해 지도학습 진행. finetuning된 모델의 마지막 단에 linear layer를 하나 추가하여 원하는 task의 objective function을 따르도록 학습한다.
+- 이때, 몇 가지 task들은 fine-tuning 시 input shape을 변형해 넣어줘야 함.
+
+  ![image](https://github.com/hihiee/Session-based-Recsys/assets/45914097/84fe43a8-6d8f-4bbb-a453-1a9fb3deac1a)
+
+
+
+
+<br/><br/><br/><br/>
+
+#### 5. GPT2
+<br/>
+GPT1은 unsupervised learning을 지향했음에도 fine-tuning 과정에서 supervised learning이 필요하다는 한계가 존재함. 따라서 비지도 기반의 언어모델 GPT2 개발.
+
+**변경점**
+
+1. Zero shot learning
+- fine-tuning 없이 zero-shot으로 down-stream task 진행 가능한 general language model 개발
+- 따라서 새로운 dataset 확보(webtext: reddit 데이터 활용)
+- voca size 50,000대로 늘었으며 context size 또한 512에서 1024 증가
+
+2. 구조 변화
+- layer normalization 위치 변경
+- residual layer 누적에 따라 initilization으로 변경. residual layer의 weight는 weight*(1/N) 값으로 초기화됨
+
+3. 토큰화 BPE(byte-pair-encoding) 사용
+- BPE는 subword segmentation 알고리즘으로, 기존 단어를 분리하는 것. character 단위에서 vocab을 만들어내는 bottom up 방식이ㅡ 접근 활용
+- OOV(Out-Of-Vocabulary) 문제에 더 유연하게 대처 가능
+</br>
+
+**BPE란?**
+```
+# vocabulary
+low, lower, newest, widest
+```
+위처럼 훈련 데이터 단어집합이 있을 경우, 테스트 과정에서 'lowest' 라는 단어가 등장한다면 이 단어를 학습한 적이 없으므로 해당 단어에 대해 제대로 대응하지 못함. 이것을 Out of Vocabulary 라고 함.
+<br/>
+이때 BPE 알고리즘을 사용할 경우, 먼저 위의 # vocabulary DB에서 단어들을 글자 단위로 분리해 **초기 단어 집합**을 만든다. 
+
+```
+# vocabulary
+l, o, w, e, r, n, s, t, i, d
+```
+이후 가장 빈도수가 높은 유니그램의 쌍을 하나의 유니그램으로 통합한다. (통합 Iteration은 hyperparameter)
+```
+# vocabulary update! (10회 반복 시)
+l, o, w, e, r, n, s, t, i, d, es, est, lo, low, ne, new, newest, wi, wid, widest
+```
+이후 input 단어 'lowest'를 전부 글자 단위로 분할하여 'l, o, w, e, s, t'로 만든 뒤, 단어집합을 참고하여 'low'와 'est'를 찾아내어 'lowest'를 'low'와 'est'의 두 단어로 인코딩함. 두 단어는 업데이트된 DB에 존재하므로 더이상 OOV 문제가 발생하지 않음.
+
+![image](https://github.com/hihiee/Session-based-Recsys/assets/45914097/2d1c21c8-c191-46c0-b379-6283876fa701)
+
