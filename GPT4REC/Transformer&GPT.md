@@ -21,8 +21,11 @@ decoder 의 input으로 encoder의 최종 출력인 context vector만을 사용�
 1. 하나의 고정 크기 벡터(context vector) 에 모든 정보를 압축하여 정보 손실 발생
 2. vanishing gradient 문제 존재
 
-특히 번역 task에서 입력 문장 길이가 길면 번역 품질이 떨어지는 현상 발생
+특히 번역 task에서 입력 문장 길이가 길면 번역 품질이 떨어지는 현상 발생            
 
+
+
+<br/>
 
 
 
